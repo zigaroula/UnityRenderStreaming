@@ -118,6 +118,22 @@ export class VideoPlayer {
     }
   }
 
+  forceUpdateLockState() {
+    // Si la case est cochée, demandez à verrouiller le pointeur.
+    if (this.lockMouseCheck.checked) {
+      if (this.videoElement.requestPointerLock) {
+        this.videoElement.requestPointerLock().catch(function (error) {
+          console.error('Pointer lock failed:', error);
+        });
+      }
+    } else {
+      // Si la case n'est pas cochée, libérez le pointeur.
+      if (document.exitPointerLock) {
+        document.exitPointerLock();
+      }
+    }
+  }
+
   /**
    * @param {MediaStreamTrack} track 
    */

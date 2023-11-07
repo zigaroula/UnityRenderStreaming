@@ -91,6 +91,7 @@ function onConnect() {
   const channel = renderstreaming.createDataChannel("input");
   videoPlayer.setupInput(channel);
   setupResolutionChannel();
+  setupLockStateChannel();
   showStatsMessage();
 }
 
@@ -203,6 +204,41 @@ function setupResolutionChannel() {
 
   // Vous pouvez envoyer la résolution initiale immédiatement si nécessaire, par exemple :
   sendResolution(playerDiv.clientWidth, playerDiv.clientHeight);
+}
+
+function setupLockStateChannel()
+{
+  const lockStateChannel = renderstreaming.createDataChannel("lockState");
+
+  function handleLockStateMessage(message) {
+    if (message instanceof ArrayBuffer)
+    {
+      const decodedString = new TextDecoder('utf-8').decode(new Uint8Array(message));
+      try {
+        const data = JSON.parse(decodedString);
+        if (data.type === 'lockPointer') {
+          lockMouseCheck.checked = data.state;
+          videoPlayer.forceUpdateLockState();
+        }
+      } catch (e) {
+        console.error('Failed to parse message:', e);
+      }
+    }
+  }
+
+  lockStateChannel.onmessage = (event) => {
+    handleLockStateMessage(event.data);
+  };
+
+  // force send unlock on escape press
+  document.addEventListener('pointerlockchange', (event) => {
+    if (document.pointerLockElement == null) {
+      const message = JSON.stringify({type: "lockPointer", state: false});
+      if (lockStateChannel && lockStateChannel.readyState == 'open') {
+        lockStateChannel.send(message);
+      }
+    }
+  })
 }
 
 function clearStatsMessage() {
