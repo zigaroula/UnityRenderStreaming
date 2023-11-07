@@ -361,3 +361,13 @@ Assets/Samples/
 WebApp/**/coverage/*
 
 .DS_Store
+
+
+# Server key files
+WebApp/client-1.local.crt
+WebApp/client-1.local.csr
+WebApp/client-1.local.key
+WebApp/rootSSL.key
+WebApp/rootSSL.pem
+WebApp/rootSSL.srl
+WebApp/webserver.exe
